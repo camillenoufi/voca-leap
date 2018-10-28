@@ -62,7 +62,7 @@ public class ChunityExampleTimeAdvancerWithHelperComponents : MonoBehaviour
 		" );
 
 		myAdvancerSyncer = gameObject.AddComponent<ChuckFloatSyncer>();
-		myAdvancerSyncer.SyncFloat( myChuck, "pos" );
+		myAdvancerSyncer.SyncFloat( myChuck, "pos" ); //current instance of chuck is determining pos value
 
 		myAdvancerListener = gameObject.AddComponent<ChuckEventListener>();
 		myAdvancerListener.ListenForEvent( myChuck, "notifier", RotateMyCube );
@@ -70,14 +70,14 @@ public class ChunityExampleTimeAdvancerWithHelperComponents : MonoBehaviour
 	}
 
 	// Update is called once per frame
-	void Update()
+	void Update() //put these steps and the start intialization code into player controller
 	{
 		float newTimeStep = Mathf.Clamp( Input.mousePosition.x, 250, 1000 ) / 1000.0f;
 
-		myChuck.SetFloat( "timeStep", newTimeStep );
-		myPos = myAdvancerSyncer.GetCurrentValue();
+		myChuck.SetFloat( "timeStep", newTimeStep );  //get timestep input from mouse position, this is to vary the "tempo" let's say
+		myPos = myAdvancerSyncer.GetCurrentValue(); //unity system gets 'pos' value from chuck and applies it to cube position
 
-		transform.position = new Vector3( myPos % 4, 0, 0 );
+        transform.position = new Vector3( myPos % 4, 0, 0 ); //apply myPos value to the cube's tranform component
 	}
 
 	void RotateMyCube()
