@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
 	public float goalPosition;
 	public Text chordText;
 	public Text embelText;
+    public Text midiText;
 	public Text winText;
 	public float midiStartNote;
 	public float zPos;
@@ -90,7 +91,7 @@ public class PlayerController : MonoBehaviour {
 				.5 => r.gain;
 				.025 => r.mix;
 				//e.set( 5::ms, 5::ms, .5, 20::ms );
-				<<< midi >>>;
+				//<<< midi >>>;
 				spork ~ play( midi ); play2( (midi+4.0) );
 				1::second => now;
 
@@ -98,13 +99,13 @@ public class PlayerController : MonoBehaviour {
 				{{
 						// start the note
 					Std.mtof(midi) => foo.freq;
-					Math.random2f( .6, .9 ) => foo.noteOn;
+					Math.random2f( .6, .9 ) => foo.pluck;
 				}}
 				fun void play2( float note )
 				{{
 						// start the note
 					Std.mtof(midi) => foo2.freq;
-					Math.random2f( .6, .9 ) => foo2.noteOn;
+					Math.random2f( .6, .9 ) => foo2.pluck;
 				}}
 
 			", yPos));
@@ -126,7 +127,7 @@ public class PlayerController : MonoBehaviour {
 				.025 => r.mix;
 				//e.set( 5::ms, 5::ms, .5, 10::ms );
 
-				<<< midi >>>;
+				//<<< midi >>>;
 				Std.mtof(midi) => foo.freq;
 				Math.random2f( .6, .9 ) => foo.pluck;
 				250::ms => now;
@@ -140,6 +141,7 @@ public class PlayerController : MonoBehaviour {
 	{	
 		chordText.text = "Chords: " + count.ToString();
         embelText.text = "Fun n' Fancy: " + countBonus.ToString();
+        midiText.text = "MIDI note: " + yPos.ToString();
 	}
 
 	void DetermineGameState () 
@@ -246,7 +248,7 @@ public class PlayerController : MonoBehaviour {
 					{
 						Math.round(Std.ftom(curr_freq)) => m_cf;
 						Math.round(Std.ftom(prev_freq)) => m_pf;
-						if (Math.round(m_cf) == Math.round(m_pf))
+						if (m_cf == m_pf)
 						{
 							count++;
 							if (count >= 10)
