@@ -22,7 +22,7 @@ public class TargetController : MonoBehaviour {
         if (other.gameObject.CompareTag("Player"))
         {
             halo.enabled = true; // false
-			Debug.Log("target triggered");
+			//Debug.Log("target triggered");
         }
     }
 }

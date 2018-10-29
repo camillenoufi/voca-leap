@@ -26,7 +26,8 @@ public class PlayerController : MonoBehaviour {
 
 	// Chuck stuff
     ChuckSubInstance myChuckPitchTrack;
-	ChuckFloatSyncer myAdvancerSyncer;
+	ChuckFloatSyncer myPitchSyncer;
+    ChuckFloatSyncer myTimeSyncer;
     float yPos; //syncer variable
 
     void Start () 
@@ -44,18 +45,22 @@ public class PlayerController : MonoBehaviour {
 		// set up chuck
         myChuckPitchTrack = GetComponent<ChuckSubInstance>();
         StartChuckPitchTrack(myChuckPitchTrack);
-        myAdvancerSyncer = gameObject.AddComponent<ChuckFloatSyncer>();
-        myAdvancerSyncer.SyncFloat(myChuckPitchTrack, "midiPos"); //current instance of chuck is determining pos value
+        myPitchSyncer = gameObject.AddComponent<ChuckFloatSyncer>();
+        myPitchSyncer.SyncFloat(myChuckPitchTrack, "midiPos"); //current instance of chuck is determining pos value
+        myTimeSyncer = gameObject.AddComponent<ChuckFloatSyncer>();
+        myTimeSyncer.SyncFloat(myChuckPitchTrack, "timePos"); //current instance of chuck is determining pos value
 
-	}
+    }
 	void Update() 
 	{
-		yPos =  myAdvancerSyncer.GetCurrentValue();
+        xPos += Time.deltaTime * speed;
+		//xPos = speed * myTimeSyncer.GetCurrentValue();
+        //Debug.Log(xPos);
+
+        yPos =  myPitchSyncer.GetCurrentValue();
         //octave offshoot error correction for intervals +/- a 9th (13 semitones)
         if ((yPos < yPosPrev - 13.0f) | (yPos > yPosPrev + 13.0f)) { yPos = yPosPrev; }
         //Debug.Log(yPos);
-
-        xPos += Time.deltaTime * speed;
 
 		Vector3 movement = new Vector3 (xPos,yPos,zPos);
         transform.position = movement;
@@ -75,13 +80,33 @@ public class PlayerController : MonoBehaviour {
 			count++; 
 			SetCountText();
 
-            Debug.Log("trigger count: " + count + ", @ MIDI " + yPos);
+            //Debug.Log("trigger count: " + count + ", @ MIDI " + yPos);
             GetComponent<ChuckSubInstance>().RunCode(string.Format(@"
-				SinOsc foo => dac;
+				//TriOsc foo => dac;
 				{0} => float midi;
+
+				Mandolin foo => JCRev r => dac;
+				Mandolin foo2 => r => dac;
+				.5 => r.gain;
+				.025 => r.mix;
+				//e.set( 5::ms, 5::ms, .5, 20::ms );
 				<<< midi >>>;
-				Std.mtof(midi) => foo.freq;
-				300::ms => now;
+				spork ~ play( midi ); play2( (midi+4.0) );
+				1::second => now;
+
+				fun void play( float note )
+				{{
+						// start the note
+					Std.mtof(midi) => foo.freq;
+					Math.random2f( .6, .9 ) => foo.noteOn;
+				}}
+				fun void play2( float note )
+				{{
+						// start the note
+					Std.mtof(midi) => foo2.freq;
+					Math.random2f( .6, .9 ) => foo2.noteOn;
+				}}
+
 			", yPos));
         }
 		
@@ -93,15 +118,20 @@ public class PlayerController : MonoBehaviour {
             SetCountText();
 			
             GetComponent<ChuckSubInstance>().RunCode(string.Format(@"
-				TriOsc foo => dac;
+				//TriOsc foo => dac;
 				{0} => float midi;
+
+				Mandolin foo => JCRev r => dac;
+				.75 => r.gain;
+				.025 => r.mix;
+				//e.set( 5::ms, 5::ms, .5, 10::ms );
+
 				<<< midi >>>;
 				Std.mtof(midi) => foo.freq;
-				300::ms => now;
+				Math.random2f( .6, .9 ) => foo.pluck;
+				250::ms => now;
 			", yPos));
-
-
-            Debug.Log("trigger bonus: " + countBonus + ", @ MIDI " + yPos);
+            //Debug.Log("trigger bonus: " + countBonus + ", @ MIDI " + yPos);
         }
     }
 
@@ -109,7 +139,7 @@ public class PlayerController : MonoBehaviour {
 	void SetCountText () 
 	{	
 		chordText.text = "Chords: " + count.ToString();
-        embelText.text = "Extras: " + countBonus.ToString();
+        embelText.text = "Fun n' Fancy: " + countBonus.ToString();
 	}
 
 	void DetermineGameState () 
@@ -125,17 +155,13 @@ public class PlayerController : MonoBehaviour {
                 winText.text = "Almost There! Keep at it!";
 			else 
                 winText.text = "Keep going!";
-            xPos = 0;
+            xPos = -5;
             yPos = midiStartNote;
 			count = 0;
 			countBonus = 0;
 			SetCountText();
 		}
 	}
-
-
-
-
 
 
 	
@@ -145,7 +171,8 @@ public class PlayerController : MonoBehaviour {
         // instantiate Chuck Pitch Tracking code
         myChuckPitchTrack.RunCode(@"
 
-			global float midiPos;
+			60.0 => global float midiPos;
+			0.0 => global float timePos;
 			
 			// analysis
 			adc => PoleZero dcblock => FFT fft => dac;
@@ -161,6 +188,13 @@ public class PlayerController : MonoBehaviour {
 			UAnaBlob blob;
 			// find sample rate
 			second / samp => float srate;
+
+			Mandolin foo => JCRev r => dac;
+				.75 => r.gain;
+				.025 => r.mix;
+				Std.mtof(60) => foo.freq;
+				Math.random2f( .6, .9 ) => foo.pluck;
+				500::ms => now;
 
 			// interpolate
 			float target_freq, curr_freq, target_gain, curr_gain;
@@ -193,13 +227,6 @@ public class PlayerController : MonoBehaviour {
 				(fft.size()/2)::samp => now;
 			}
 
-			//convert freq to perceptually relevant scale
-			fun float midi_scale(float f)
-			{
-				69 + 12*Math.log2(f/440.0) => float m;
-				//<<< ""m: "", m >>>;
-				return m;
-			}
 				// interpolation
 			fun void ramp_stuff()
 			{
@@ -217,12 +244,12 @@ public class PlayerController : MonoBehaviour {
 					(target_gain - curr_gain) * slew + curr_gain => curr_gain;
 					if (prev_freq > -1.0 && curr_freq >= 110.0 && curr_freq <= 1760)  //plausible sung pitch
 					{
-						midi_scale(curr_freq) => m_cf;
-						midi_scale(prev_freq) => m_pf;
+						Math.round(Std.ftom(curr_freq)) => m_cf;
+						Math.round(Std.ftom(prev_freq)) => m_pf;
 						if (Math.round(m_cf) == Math.round(m_pf))
 						{
 							count++;
-							if (count >= 5)
+							if (count >= 10)
 							{
 								//curr_freq => s.freq;
 								//0 => s.gain;
@@ -239,10 +266,12 @@ public class PlayerController : MonoBehaviour {
 					}
 					curr_freq => prev_freq;
 					0.0025::second => now;
+					0.0025 + timePos => timePos;
 				}
 			}
 			
 		");
 	}
+
 }
 

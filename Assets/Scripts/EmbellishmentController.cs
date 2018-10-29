@@ -24,7 +24,7 @@ public class EmbellishmentController : MonoBehaviour {
         if (other.gameObject.CompareTag("Player"))
         {
             halo.enabled = true; // false
-            Debug.Log("embell triggered");
+            //Debug.Log("embell triggered");
         }
     }
 }
