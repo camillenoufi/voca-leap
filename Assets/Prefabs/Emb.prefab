@@ -41,6 +41,7 @@ GameObject:
   - component: {fileID: 54379494979973484}
   - component: {fileID: 135694656084989774}
   - component: {fileID: 114551778113015200}
+  - component: {fileID: 114434724034697362}
   m_Layer: 0
   m_Name: Emb
   m_TagString: Embel
@@ -130,7 +131,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1604379323564866}
   m_LocalRotation: {x: 0.56372344, y: 0.33330727, z: -0.31721902, w: 0.6859259}
-  m_LocalPosition: {x: 2.4491367, y: 2.219572, z: 0.34837055}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.6999999, y: 0.7000004, z: 0.7000003}
   m_Children:
   - {fileID: 4071161430920526}
@@ -275,7 +276,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
@@ -287,8 +288,8 @@ BoxCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1257247378767652}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
+  m_IsTrigger: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -299,11 +300,22 @@ BoxCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1803449209095254}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
+  m_IsTrigger: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114434724034697362
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1604379323564866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a6e9fbdd3fe2483e97c5be40a7c7fc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114551778113015200
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -326,7 +338,7 @@ Halo:
   m_Color:
     serializedVersion: 2
     rgba: 4290574868
-  m_Size: 0.8
+  m_Size: 1
 --- !u!135 &135694656084989774
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -337,7 +349,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &135825013393323856
 SphereCollider:
@@ -346,8 +358,8 @@ SphereCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1865479389765420}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
+  m_IsTrigger: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
