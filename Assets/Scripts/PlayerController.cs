@@ -61,6 +61,7 @@ public class PlayerController : MonoBehaviour {
         yPos =  myPitchSyncer.GetCurrentValue();
         //octave offshoot error correction for intervals +/- a 9th (13 semitones)
         if ((yPos < yPosPrev - 13.0f) | (yPos > yPosPrev + 13.0f)) { yPos = yPosPrev; }
+        midiText.text = "MIDI note: " + yPos.ToString();
         //Debug.Log(yPos);
 
 		Vector3 movement = new Vector3 (xPos,yPos,zPos);
@@ -141,7 +142,6 @@ public class PlayerController : MonoBehaviour {
 	{	
 		chordText.text = "Chords: " + count.ToString();
         embelText.text = "Fun n' Fancy: " + countBonus.ToString();
-        midiText.text = "MIDI note: " + yPos.ToString();
 	}
 
 	void DetermineGameState () 
